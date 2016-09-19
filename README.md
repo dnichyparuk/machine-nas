@@ -1,10 +1,17 @@
 # machine-nas
-Scripts, how-to, articles to configure zeus, etc...
+Scripts, how-to, articles to configure the machine, etc...
 
 Features:
 - Serviio media player (DLNA)
+- Transmission torrents
 
 ## Infrastructure
+### Folders
+```sh
+sudo -i
+mkdir -p /docker/{crashplan,plex,serviio,transmission}/config
+chown -R kwull:kwull /docker
+```
 ### VPN: [OpenVPN](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04) 
 ### Disk consolidation: [mergerfs](https://github.com/trapexit/mergerfs) 
 ```sh
@@ -41,3 +48,20 @@ docker create --name=serviio \
 -e PGID=1000 -e PUID=1000 \
 --net=host kwull/serviio
 ```
+
+### [Transmission](https://hub.docker.com/r/linuxserver/transmission/)
+
+```sh
+docker create --name=transmission \
+-v /etc/localtime:/etc/localtime:ro \
+-v /docker/transmission/config:/config \
+-v /media/nas/Transmission/Completed:/downloads \
+-v /media/nas/Transmission/Watch:/watch \
+-v /media/nas/Transmission/Incomplete:/incomplete \
+-p 9091:9091 -p 51413:51413 \
+-p 51413:51413/udp \
+-e PGID=1000 -e PUID=1000 \
+linuxserver/transmission
+```
+
+
