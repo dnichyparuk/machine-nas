@@ -38,7 +38,11 @@ UUID=06391d3b-e722-424e-a681-1ba9d79dd163 /media/disk4 ext4 defaults,noatime,nof
 ### [DockerUI](https://github.com/kevana/ui-for-docker)
 
 ```sh
-docker create --name=dockerui -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock uifd/ui-for-docker
+docker create --name=dockerui \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-p 9000:9000 \
+--privileged \
+uifd/ui-for-docker
 ```
 
 ### [Serviio](https://github.com/Kwull/docker-serviio)
