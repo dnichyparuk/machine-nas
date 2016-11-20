@@ -4,6 +4,7 @@ Scripts, how-to, articles to configure the machine, etc...
 Features:
 - Docker UI
 - Serviio media player (DLNA)
+- Plex media player
 - Transmission torrents
 
 ## Infrastructure
@@ -97,6 +98,24 @@ docker create --name=transmission \
 -p 51413:51413/udp \
 -e PGID=1000 -e PUID=1000 \
 linuxserver/transmission
+```
+
+### [Plex](https://hub.docker.com/r/linuxserver/plex/)
+
+```sh
+docker create \
+--name=plex \
+--net=host \
+-e VERSION=latest \
+-e TZ=Europe/Minsk \
+-v /docker/plex/config:/config \
+-v /docker/plex/transcode:/transcode \
+-v /media/nas/Transmission/Completed:/media/Completed \
+-v /media/nas/Video:/media/Video \
+-v /media/nas/Music:/media/Music \
+-v /media/nas/Album:/media/Album \
+-e PGID=1000 -e PUID=1000 \
+linuxserver/plex
 ```
 
 
