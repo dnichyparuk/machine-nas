@@ -35,6 +35,30 @@ UUID=06391d3b-e722-424e-a681-1ba9d79dd163 /media/disk4 ext4 defaults,noatime,nof
 
 ## Docker containers
 
+### [systemd autostart example](https://docs.docker.com/engine/admin/host_integration/)
+
+/etc/systemd/system/serviio.service
+```sh
+[Unit]
+Description=Serviio container
+Requires=docker.service media-nas.mount
+After=docker.service media-nas.mount
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a serviio
+ExecStop=/usr/bin/docker stop -t 2 serviio
+
+[Install]
+WantedBy=default.target
+```
+
+```sh
+systemctl daemon-reload
+systemctl enable serviio
+systemctl start serviio
+```
+
 ### [DockerUI](https://github.com/kevana/ui-for-docker)
 
 ```sh
