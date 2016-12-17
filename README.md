@@ -134,3 +134,15 @@ docker create \
 linuxserver/mariadb
 ```
 
+### [tt-rss](https://hub.docker.com/r/linuxserver/tt-rss/)
+
+```sh
+docker create \
+--name=tt-rss \
+-v /etc/localtime:/etc/localtime:ro \
+-v /docker/tt-rss:/config \
+-e PGID=1000 -e PUID=1000 \
+-e TZ=Europe/Minsk \
+-p 8081:80 -p8443:443 \
+linuxserver/tt-rss
+```
