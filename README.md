@@ -138,11 +138,11 @@ linuxserver/mariadb
 
 ```sh
 docker create \
---name=tt-rss \
+--name=tt-rss --link mariadb:db \
 -v /etc/localtime:/etc/localtime:ro \
 -v /docker/tt-rss:/config \
 -e PGID=1000 -e PUID=1000 \
 -e TZ=Europe/Minsk \
--p 8081:80 -p8443:443 \
+-p 8081:80 -p8444:443 \
 linuxserver/tt-rss
 ```
