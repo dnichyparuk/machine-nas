@@ -9,6 +9,7 @@ Features:
 - openhab (not in docker now)
 - MariaDB as storage (tt-rss, openhab, etc...)
 - tt-rss
+- muximux
 
 ## Infrastructure
 ### Folders
@@ -145,4 +146,15 @@ docker create \
 -e TZ=Europe/Minsk \
 -p 8081:80 -p8444:443 \
 linuxserver/tt-rss
+```
+
+### [muximux](https://hub.docker.com/r/linuxserver/muximux/)
+
+```sh
+docker create \
+--name=muximux \
+-v /docker/muximux:/config \
+-e PGID=1000 -e PUID=1000  \
+-e TZ=Europe/Minsk -p 80:80 \
+linuxserver/muximux
 ```
