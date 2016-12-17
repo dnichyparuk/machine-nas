@@ -3,9 +3,12 @@ Scripts, how-to, articles to configure the machine, etc...
 
 Features:
 - Docker UI
-- Serviio media player (DLNA)
+- Serviio media player (DLNA) (not in docker now)
 - Plex media player
 - Transmission torrents
+- openhab (not in docker now)
+- MariaDB as storage (tt-rss, openhab, etc...)
+- tt-rss
 
 ## Infrastructure
 ### Folders
@@ -118,4 +121,16 @@ docker create \
 linuxserver/plex
 ```
 
+### [MariaDB](https://hub.docker.com/r/linuxserver/mariadb/)
+
+```sh
+docker create \
+--name=mariadb \
+-p 3306:3306 \
+-e PUID=1000 -e PGID=1000 \
+-e MYSQL_ROOT_PASSWORD=<DATABASE PASSWORD> \
+-e TZ=Europe/Minsk \
+-v /docker/mariadb:/config \
+linuxserver/mariadb
+```
 
