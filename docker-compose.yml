@@ -1,0 +1,94 @@
+version: '2'
+services:
+    dockerui:
+        image: uifd/ui-for-docker
+        container_name: dockerui
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 9000:9000
+        restart: always
+        privileged: true
+            
+    transmission:
+        image: linuxserver/transmission
+        container_name: transmission
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /docker/transmission/config:/config
+            - /media/nas/Transmission/Completed:/downloads
+            - /media/nas/Transmission/Watch:/watch
+            - /media/nas/Transmission/Incomplete:/incomplete
+            - /media/nas/Video:/video
+            - /media/nas/Music:/music
+        ports:
+            - 9091:9091
+            - 51413:51413
+            - 51413:51413/udp
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000
+            
+    plex:
+        image: linuxserver/plex
+        container_name: plex
+        network_mode: "host"
+        volumes:
+            - /docker/plex/config:/config
+            - /docker/plex/transcode:/transcode
+            - /media/nas/Transmission/Completed:/media/Completed
+            - /media/nas/Video:/media/Video
+            - /media/nas/Music:/media/Music
+            - /media/nas/Album:/media/Album
+        restart: always
+        environment:
+            - VERSION=latest
+            - TZ=Europe/Minsk
+            - PGID=1000
+            - PUID=1000
+
+    mariadb:
+        image: linuxserver/mariadb 
+        container_name: mariadb 
+        volumes:
+            - /docker/mariadb:/config
+        ports:
+            - 3306:3306
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000
+            - MYSQL_ROOT_PASSWORD=password
+            - TZ=Europe/Minsk
+            
+    tt-rss:
+        image: linuxserver/tt-rss 
+        container_name: tt-rss 
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /docker/tt-rss:/config
+        ports:
+            - 8081:80
+            - 8444:443
+        links:
+            - mariadb:db
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000
+            - TZ=Europe/Minsk            
+
+    muximux:
+        image: linuxserver/muximux 
+        container_name: muximux  
+        volumes:
+            - /docker/muximux:/config
+            - /docker/tt-rss:/config
+        ports:
+            - 80:80
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000
+            - TZ=Europe/Minsk  
