@@ -59,7 +59,7 @@ services:
         environment:
             - PGID=1000
             - PUID=1000
-            - MYSQL_ROOT_PASSWORD=password
+            - MYSQL_ROOT_PASSWORD
             - TZ=Europe/Minsk
             
     tt-rss:
@@ -92,3 +92,22 @@ services:
             - PGID=1000
             - PUID=1000
             - TZ=Europe/Minsk  
+            
+    crashplan:
+        image: jrcs/crashplan
+        container_name: crashplan  
+        volumes:
+            - /docker/crashplan/config:/var/crashplan
+            - /media/nas:/media/nas
+            - /media/nas/Backups/Crashplan:/storage
+            - /docker:/media/docker
+            - /etc/systemd:/media/etc/systemd
+            - /etc/openvpn:/media/etc/openvpn
+            - /root/openvpn-ca:/media/root/openvpn-ca
+        ports:
+            - 4242:4242
+            - 4243:4243
+        restart: always
+        hostname: machine
+        environment:
+            - TZ=Europe/Minsk       
