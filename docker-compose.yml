@@ -125,3 +125,21 @@ services:
         hostname: machine
         environment:
             - TZ=Europe/Minsk       
+            
+    unifi:
+        image: linuxserver/unifi 
+        container_name: unifi
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /docker/unifi:/config
+        ports:
+            - 9080:8080
+            - 9081:8081
+            - 9443:8443 
+            - 9843:8843
+            - 9880:8880
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000
+            - TZ=Europe/Minsk                 
