@@ -143,3 +143,19 @@ services:
             - PGID=1000
             - PUID=1000
             - TZ=Europe/Minsk                 
+
+    sonarr:
+        image: linuxserver/sonarr
+        container_name: sonarr  
+        volumes:
+            - /docker/sonarr/config:/config
+            - /dev/rtc:/dev/rtc:ro
+            - /media/nas/Video/Зарубежные сериалы:/tv
+            - /media/nas/Transmission/Completed:/downloads
+        ports:
+            - 8989:8989
+        restart: always 
+        environment:
+            - PGID=1000
+            - PUID=1000
+            
