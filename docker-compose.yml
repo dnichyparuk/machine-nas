@@ -144,18 +144,37 @@ services:
             - PUID=1000
             - TZ=Europe/Minsk                 
 
-    sonarr:
-        image: linuxserver/sonarr
-        container_name: sonarr  
+    #sonarr:
+    #    image: linuxserver/sonarr
+    #    container_name: sonarr  
+    #    volumes:
+    #        - /docker/sonarr/config:/config
+    #        - /dev/rtc:/dev/rtc:ro
+    #        - /media/nas/Video/Зарубежные сериалы:/tv
+    #        - /media/nas/Transmission/Completed:/downloads
+    #    ports:
+    #        - 8989:8989
+    #    restart: always 
+    #    environment:
+    #        - PGID=1000
+    #        - PUID=1000
+    
+    torrentmonitor:
+        image: nawa/torrentmonitor
+        container_name: torrentmonitor
+        hostname: torrentmonitor
         volumes:
-            - /docker/sonarr/config:/config
-            - /dev/rtc:/dev/rtc:ro
-            - /media/nas/Video/Зарубежные сериалы:/tv
-            - /media/nas/Transmission/Completed:/downloads
+            - /docker/torrentmonitor:/data/htdocs/db
+            - /media/nas/Transmission/Completed:/data/htdocs/torrents
+            - /media/nas/Video:/media/Video
+            - /media/nas/Music:/media/Music
         ports:
-            - 8989:8989
-        restart: always 
+            - 9080:80/tcp
+        restart: always
+        links:
+            - transmission
         environment:
-            - PGID=1000
-            - PUID=1000
-            
+            - CRON_TIMEOUT="0 * * * *"
+            - PHP_TIMEZONE="Europe/Minsk"
+            - PHP_MEMORY_LIMIT="512M"
+            - TZ=Europe/Minsk      
