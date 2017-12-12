@@ -11,6 +11,7 @@ Features:
 - [MariaDB as storage (tt-rss, openhab, etc...)](https://hub.docker.com/r/linuxserver/mariadb/)
 - [tt-rss](https://hub.docker.com/r/linuxserver/tt-rss/)
 - [muximux](https://hub.docker.com/r/linuxserver/muximux/)
+- [openhab](https://hub.docker.com/r/openhab/openhab/)
 
 ## Infrastructure
 ### Folders
