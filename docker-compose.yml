@@ -180,7 +180,7 @@ services:
             - TZ=Europe/Minsk      
 
     openhab:
-        image: openhab/openhab
+        image: openhab/openhab:2.1.0-amd64-alpine
         container_name: openhab
         volumes:
             - /etc/localtime:/etc/localtime:ro
