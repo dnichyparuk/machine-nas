@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
     dockerui:
         image: uifd/ui-for-docker
@@ -31,7 +31,7 @@ services:
             - PUID=1000
             
     plex:
-        image: linuxserver/plex
+        image: kwull/pms-docker
         container_name: plex
         network_mode: "host"
         volumes:
@@ -41,12 +41,17 @@ services:
             - /media/nas/Video:/media/Video
             - /media/nas/Music:/media/Music
             - /media/nas/Album:/media/Album
+        devices:
+            - /dev/dri:/dev/dri 
         restart: always
+        privileged: true
         environment:
-            - VERSION=latest
+#            - VERSION=latest
             - TZ=Europe/Minsk
             - PGID=1000
             - PUID=1000
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
 
     plexpy:
         image: linuxserver/plexpy
@@ -60,74 +65,10 @@ services:
         environment:
             - TZ=Europe/Minsk
             - PGID=1000
-            - PUID=1000            
-            
-    mariadb:
-        image: linuxserver/mariadb 
-        container_name: mariadb 
-        volumes:
-            - /docker/mariadb:/config
-        ports:
-            - 3306:3306
-        restart: always
-        environment:
-            - PGID=1000
             - PUID=1000
-            - MYSQL_ROOT_PASSWORD
-            - TZ=Europe/Minsk
-            
-    tt-rss:
-        image: linuxserver/tt-rss 
-        container_name: tt-rss 
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /docker/tt-rss:/config
-        ports:
-            - 9081:80
-            - 9444:443
-        links:
-            - mariadb:db
-        restart: always
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - TZ=Europe/Minsk            
 
-    muximux:
-        image: linuxserver/muximux 
-        container_name: muximux  
-        volumes:
-            - /docker/muximux:/config
-            - /docker/tt-rss:/config
-        ports:
-            - 80:80
-        restart: always
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - TZ=Europe/Minsk  
-            
-    crashplan:
-        image: jrcs/crashplan
-        container_name: crashplan  
-        volumes:
-            - /docker/crashplan/config:/var/crashplan
-            - /media/nas:/media/nas:ro
-            - /media/nas/Backups/Crashplan:/storage
-            - /docker:/media/docker:ro
-            - /etc/systemd:/media/etc/systemd:ro
-            - /etc/openvpn:/media/etc/openvpn:ro
-            - /root/openvpn-ca:/media/root/openvpn-ca:ro
-        ports:
-            - 4242:4242
-            - 4243:4243
-        restart: always
-        hostname: machine
-        environment:
-            - TZ=Europe/Minsk       
-            
     unifi:
-        image: linuxserver/unifi 
+        image: linuxserver/unifi
         container_name: unifi
         volumes:
             - /etc/localtime:/etc/localtime:ro
@@ -135,73 +76,154 @@ services:
         ports:
             - 8080:8080
             - 8081:8081
-            - 8443:8443 
+            - 8443:8443
             - 8843:8843
             - 8880:8880
             - 3478/udp:3478/udp
             - 6789:6789
-            - 10001:10001            
+            - 10001:10001
         restart: always
         environment:
             - PGID=1000
             - PUID=1000
-            - TZ=Europe/Minsk                 
+            - TZ=Europe/Minsk  
 
-    #sonarr:
-    #    image: linuxserver/sonarr
-    #    container_name: sonarr  
-    #    volumes:
-    #        - /docker/sonarr/config:/config
-    #        - /dev/rtc:/dev/rtc:ro
-    #        - /media/nas/Video/Зарубежные сериалы:/tv
-    #        - /media/nas/Transmission/Completed:/downloads
-    #    ports:
-    #        - 8989:8989
-    #    restart: always 
-    #    environment:
-    #        - PGID=1000
-    #        - PUID=1000
-    
-    torrentmonitor:
-        image: nawa/torrentmonitor
-        container_name: torrentmonitor
-        hostname: torrentmonitor
-        volumes:
-            - /docker/torrentmonitor:/data/htdocs/db
-            - /media/nas/Transmission/Completed:/data/htdocs/torrents
-            - /media/nas/Video:/media/Video
-            - /media/nas/Music:/media/Music
-        ports:
-            - 9080:80/tcp
-        restart: always
-        links:
-            - transmission
-        environment:
-            - CRON_TIMEOUT="0 * * * *"
-            - PHP_TIMEZONE="Europe/Minsk"
-            - PHP_MEMORY_LIMIT="512M"
-            - TZ=Europe/Minsk      
-
-    openhab:
-        image: openhab/openhab:2.1.0-amd64-alpine
-        container_name: openhab
+    unifi-video:
+        image: pducharme/unifi-video-controller
+        container_name: unifi-video
         volumes:
             - /etc/localtime:/etc/localtime:ro
-            - /etc/timezone:/etc/timezone:ro
-            - /docker/openhab/conf:/openhab/conf
-            - /docker/openhab/userdata:/openhab/userdata
-            - /docker/openhab/addons:/openhab/addons
-            - /docker/openhab/.java:/openhab/.java
-        network_mode: "host"
+            - /docker/unifi-video:/var/lib/unifi-video
+            - /media/nas/cctv:/var/lib/unifi-video/videos
         restart: always
-        devices:
-            - "/dev/ttyUSB0:/dev/ttyUSB0"
+        network_mode: host
+        cap_add:
+            - SYS_ADMIN
+            - DAC_READ_SEARCH
+        security_opt:
+            - apparmor:unconfined
         environment:
-            - PGID=997
-            - PUID=998
-            - OPENHAB_HTTP_PORT=7080
-            - OPENHAB_HTTPS_PORT=7443
-            
-            
-            
-            
+            - PGID=1000
+            - PUID=1000
+            - TZ=Europe/Minsk
+
+    yolo:
+       image: kwull/yolo-docker
+       container_name: yolo
+       volumes:
+           - /etc/localtime:/etc/localtime:ro
+           - /docker/yolo:/config
+           - /media/nas/cctv/motion:/cctv/motion
+           - /media/nas/cctv/tagged:/cctv/tagged
+       restart: always
+       environment:
+           - PGID=1000
+           - PUID=1000
+           - TZ=Europe/Minsk
+
+    letsencrypt:
+         image: linuxserver/letsencrypt
+         container_name: letsencrypt
+         ports:
+            - 443:443
+            - 80:80
+         volumes:
+            - /docker/letsencrypt:/config
+         restart: always
+         environment:
+            - PUID=1000
+            - PGID=1000
+            - EMAIL=kwull@kwull.com
+            - URL=kwull.com
+            - SUBDOMAINS=home,plex,plexpy,api,unifi,machine,transmission,zeus
+            - VALIDATION=http
+#            - DNSPLUGIN=rfc2136
+            - ONLY_SUBDOMAINS=true
+            - DHLEVEL=4096
+            - TZ=Europe/Minsk
+
+    mosquitto:
+         image: eclipse-mosquitto
+         container_name: mosquitto
+         ports:
+            - 1883:1883
+            - 9001:9001
+         volumes:
+            - /docker/mosquitto/config:/mosquitto/config
+            - /docker/mosquitto/data:/mosquitto/data
+            - /docker/mosquitto/log:/mosquitto/log
+         restart: always
+         environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Minsk
+
+    nodered:
+         image: nodered/node-red-docker
+         container_name: nodered
+         ports:
+            - 1880:1880
+            - 8089:8089
+         volumes:
+            - /docker/nodered/data:/data
+         restart: always
+         depends_on:
+            - mosquitto
+            - homeassistant
+         environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Minsk
+
+    influxdb:
+         image: influxdb
+         container_name: influxdb
+         ports:
+            - 8086:8086
+         volumes:
+            - /docker/influxdb/data:/var/lib/influxdb
+            - /docker/influxdb/config:/etc/influxdb
+            - /etc/localtime:/etc/localtime:ro
+         restart: always
+         environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Minsk
+
+    grafana:
+         image: grafana/grafana
+         container_name: grafana
+         ports:
+            - 3000:3000
+         volumes:
+            - /docker/grafana:/var/lib/grafana
+            - /etc/localtime:/etc/localtime:ro
+         restart: always
+         depends_on:
+            - influxdb
+         environment:
+            - GF_DASHBOARDS_JSON_ENABLED=true
+            - GF_DASHBOARDS_JSON_PATH=/var/lib/grafana/dashboards
+            - GF_ANALYTICS_ENABLED=false
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Minsk
+
+    homeassistant:
+      container_name: home-assistant
+      image: homeassistant/home-assistant
+      volumes:
+        - /docker/hass/config:/config
+        - /etc/localtime:/etc/localtime:ro
+      devices:
+        - /dev/ttyUSB0:/dev/ttyUSB0
+      restart: always
+      network_mode: host
+      depends_on:
+            - mosquitto
+#            - grafana
+            - unifi-video
+      environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Minsk
