@@ -15,12 +15,8 @@ services:
         container_name: transmission
         volumes:
             - /etc/localtime:/etc/localtime:ro
-            - /docker/transmission/config:/config
-            - /media/nas/Transmission/Completed:/downloads
-            - /media/nas/Transmission/Watch:/watch
-            - /media/nas/Transmission/Incomplete:/incomplete
-            - /media/nas/Video:/video
-            - /media/nas/Music:/music
+            - /media/nas/video:/Video
+            - /media/nas/music:/Music
         ports:
             - 9091:9091
             - 51413:51413
@@ -29,18 +25,37 @@ services:
         environment:
             - PGID=1000
             - PUID=1000
-            
+    serviio:
+        image: dnichyparuk/docker-serviio
+        container_name: serviio
+        network_mode: "host"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /docker/serviio/config:/config
+            - /docker/serviio/transcode:/transcode
+            - /media/nas/transmission/completed:/media/Completed
+            - /media/nas/video:/media
+        restart: always
+        devices:
+            - /dev/dri:/dev/dri
+        privileged: true
+        environment:
+#            - VERSION=latest
+            - TZ=Europe/Minsk
+            - PGID=1000
+            - PUID=1000
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility        
     plex:
-        image: kwull/pms-docker
+        image: dnichyparuk/pms-docker
         container_name: plex
         network_mode: "host"
         volumes:
             - /docker/plex/config:/config
             - /docker/plex/transcode:/transcode
-            - /media/nas/Transmission/Completed:/media/Completed
-            - /media/nas/Video:/media/Video
-            - /media/nas/Music:/media/Music
-            - /media/nas/Album:/media/Album
+            - /media/nas/transmission/completed:/media/Completed
+            - /media/nas/video:/media/Video
+            - /media/nas/music:/media/Music
         devices:
             - /dev/dri:/dev/dri 
         restart: always
@@ -79,7 +94,7 @@ services:
             - 8443:8443
             - 8843:8843
             - 8880:8880
-            - 3478/udp:3478/udp
+            - 3478:3478/udp
             - 6789:6789
             - 10001:10001
         restart: always
@@ -88,27 +103,8 @@ services:
             - PUID=1000
             - TZ=Europe/Minsk  
 
-    unifi-video:
-        image: pducharme/unifi-video-controller
-        container_name: unifi-video
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /docker/unifi-video:/var/lib/unifi-video
-            - /media/nas/cctv:/var/lib/unifi-video/videos
-        restart: always
-        network_mode: host
-        cap_add:
-            - SYS_ADMIN
-            - DAC_READ_SEARCH
-        security_opt:
-            - apparmor:unconfined
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - TZ=Europe/Minsk
-
     yolo:
-       image: kwull/yolo-docker
+       image: dnichyparuk/yolo-docker
        container_name: yolo
        volumes:
            - /etc/localtime:/etc/localtime:ro
@@ -120,110 +116,3 @@ services:
            - PGID=1000
            - PUID=1000
            - TZ=Europe/Minsk
-
-    letsencrypt:
-         image: linuxserver/letsencrypt
-         container_name: letsencrypt
-         ports:
-            - 443:443
-            - 80:80
-         volumes:
-            - /docker/letsencrypt:/config
-         restart: always
-         environment:
-            - PUID=1000
-            - PGID=1000
-            - EMAIL=kwull@kwull.com
-            - URL=kwull.com
-            - SUBDOMAINS=home,plex,plexpy,api,unifi,machine,transmission,zeus
-            - VALIDATION=http
-#            - DNSPLUGIN=rfc2136
-            - ONLY_SUBDOMAINS=true
-            - DHLEVEL=4096
-            - TZ=Europe/Minsk
-
-    mosquitto:
-         image: eclipse-mosquitto
-         container_name: mosquitto
-         ports:
-            - 1883:1883
-            - 9001:9001
-         volumes:
-            - /docker/mosquitto/config:/mosquitto/config
-            - /docker/mosquitto/data:/mosquitto/data
-            - /docker/mosquitto/log:/mosquitto/log
-         restart: always
-         environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/Minsk
-
-    nodered:
-         image: nodered/node-red-docker
-         container_name: nodered
-         ports:
-            - 1880:1880
-            - 8089:8089
-         volumes:
-            - /docker/nodered/data:/data
-         restart: always
-         depends_on:
-            - mosquitto
-            - homeassistant
-         environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/Minsk
-
-    influxdb:
-         image: influxdb
-         container_name: influxdb
-         ports:
-            - 8086:8086
-         volumes:
-            - /docker/influxdb/data:/var/lib/influxdb
-            - /docker/influxdb/config:/etc/influxdb
-            - /etc/localtime:/etc/localtime:ro
-         restart: always
-         environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/Minsk
-
-    grafana:
-         image: grafana/grafana
-         container_name: grafana
-         ports:
-            - 3000:3000
-         volumes:
-            - /docker/grafana:/var/lib/grafana
-            - /etc/localtime:/etc/localtime:ro
-         restart: always
-         depends_on:
-            - influxdb
-         environment:
-            - GF_DASHBOARDS_JSON_ENABLED=true
-            - GF_DASHBOARDS_JSON_PATH=/var/lib/grafana/dashboards
-            - GF_ANALYTICS_ENABLED=false
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/Minsk
-
-    homeassistant:
-      container_name: home-assistant
-      image: homeassistant/home-assistant
-      volumes:
-        - /docker/hass/config:/config
-        - /etc/localtime:/etc/localtime:ro
-      devices:
-        - /dev/ttyUSB0:/dev/ttyUSB0
-      restart: always
-      network_mode: host
-      depends_on:
-            - mosquitto
-#            - grafana
-            - unifi-video
-      environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/Minsk
