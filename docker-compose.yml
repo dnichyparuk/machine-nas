@@ -38,6 +38,8 @@ services:
         restart: always
         devices:
             - /dev/dri:/dev/dri
+        ports:
+            - 23423:23423
         privileged: true
         environment:
 #            - VERSION=latest
