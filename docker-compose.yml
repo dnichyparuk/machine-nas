@@ -34,7 +34,7 @@ services:
             - /docker/serviio/config:/config
             - /docker/serviio/transcode:/transcode
             - /media/nas/transmission/completed:/media/Completed
-            - /media/nas/video:/media
+            - /media/nas:/media
         restart: always
         devices:
             - /dev/dri:/dev/dri
