@@ -9,6 +9,7 @@ services:
             - /media/nas/video:/Video
             - /media/nas/music:/Music
             - /media/nas/transmission:/downloads
+            - /media/nas/yandex_disk/_torrents/inbox:/watch
         ports:
             - 9091:9091
             - 51413:51413
