@@ -1,0 +1,15 @@
+version: '3'
+services:
+    yolo:
+       image: dnichyparuk/yolo-docker
+       container_name: yolo
+       volumes:
+           - /etc/localtime:/etc/localtime:ro
+           - /docker/yolo:/config
+           - /media/nas/cctv/motion:/cctv/motion
+           - /media/nas/cctv/tagged:/cctv/tagged
+       restart: always
+       environment:
+           - PGID=1000
+           - PUID=1000
+           - TZ=Europe/Minsk

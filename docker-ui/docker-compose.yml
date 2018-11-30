@@ -1,0 +1,11 @@
+version: '3'
+services:
+    dockerui:
+        image: uifd/ui-for-docker
+        container_name: dockerui
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 9000:9000
+        restart: always
+        privileged: true

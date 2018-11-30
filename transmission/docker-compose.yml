@@ -1,0 +1,19 @@
+version: '3'
+services:
+    transmission:
+        image: linuxserver/transmission
+        container_name: transmission
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /docker/transmission/config:/config
+            - /media/nas/video:/Video
+            - /media/nas/music:/Music
+            - /media/nas/transmission:/downloads
+        ports:
+            - 9091:9091
+            - 51413:51413
+            - 51413:51413/udp
+        restart: always
+        environment:
+            - PGID=1000
+            - PUID=1000

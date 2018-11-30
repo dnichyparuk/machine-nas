@@ -1,0 +1,36 @@
+version: '3'
+services:
+    plex:
+        image: dnichyparuk/pms-docker
+        container_name: plex
+        network_mode: "host"
+        volumes:
+            - /docker/plex/config:/config
+            - /media/nas/transcode/plex:/transcode
+            - /media/nas/transmission/complete:/media/Completed
+            - /media/nas/video:/media/Video
+            - /media/nas/music:/media/Music
+        devices:
+            - /dev/dri:/dev/dri 
+        restart: always
+        privileged: true
+        environment:
+#            - VERSION=latest
+            - TZ=Europe/Minsk
+            - PGID=1000
+            - PUID=1000
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+    tautulli:
+        image: linuxserver/tautulli
+        container_name: tautulli
+        volumes:
+            - /docker/tautulli/config:/config
+            - /docker/plex/config/Library/Application Support/Plex Media Server/Logs:/logs
+        ports:
+            - 8181:8181            
+        restart: always
+        environment:
+            - TZ=Europe/Minsk
+            - PGID=1000
+            - PUID=1000

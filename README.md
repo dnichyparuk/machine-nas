@@ -71,7 +71,6 @@ ExecStop=/usr/bin/docker stop -t 2 serviio
 [Install]
 WantedBy=default.target
 ```
-
 ```sh
 systemctl daemon-reload
 systemctl enable serviio
@@ -92,3 +91,8 @@ docker create --name=serviio \
 -e PGID=1000 -e PUID=1000 \
 --net=host kwull/serviio
 ```
+sudo ln -sfn /media/disk1/yandex_disk yandex_disk
+sudo ln -sfn /media/disk0/video video
+sudo ln -sfn /media/disk1/transmission transmission
+sudo ln -sfn /media/disk1/transcode transcode
+sudo ln -sfn /media/disk1/share share
